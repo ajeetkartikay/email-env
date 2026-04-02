@@ -39,9 +39,15 @@ email-env/
 │   ├── environment.py   # Core environment logic
 │   ├── graders.py       # Reward/scoring functions
 │   └── models.py        # Pydantic typed models
+├── server/
+│   ├── __init__.py      # Server package
+│   └── app.py           # Server entry point
+├── app.py               # FastAPI server (HF Space endpoint)
 ├── inference.py         # Baseline inference script
-├── server.py            # FastAPI server (HF Space endpoint)
+├── server.py            # Legacy server file
 ├── openenv.yaml         # OpenEnv spec metadata
+├── pyproject.toml       # Project configuration
+├── uv.lock              # Dependency lock file
 ├── Dockerfile           # Container definition
 ├── requirements.txt     # Python dependencies
 └── README.md            # This file
