@@ -168,10 +168,8 @@ python inference.py
 | Task   | Difficulty | Baseline Score |
 |--------|------------|----------------|
 | task_1 | Easy       | 0.80           |
-| task_2 | Medium     | 0.70           |
-| task_3 | Hard       | 0.50           |
-
----
+| task_2 | Medium     | 1.00           |
+| task_3 | Hard       | 1.00           |
 
 ## 🐳 Docker
 ```bash
