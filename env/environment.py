@@ -37,7 +37,7 @@ class EmailEnv:
             )
 
         self._state.step_count += 1
-        score = grade_response(self._state.current_email, action.response)
+        score = grade_response(self._state.current_email, action.response, self.task_id)
         self._state.done = True
 
         obs = EmailObservation(
