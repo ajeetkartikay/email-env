@@ -45,6 +45,7 @@ class EmailEnv:
             step_count=self._state.step_count,
             task_id=self._state.task_id
         )
+        score = round(min(max(score, 0.01), 0.99), 2)
         return obs, score, True, {"score": score}
 
     def state(self) -> EmailState:

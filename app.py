@@ -33,10 +33,10 @@ def reset(request: ResetRequest = None):
     obs = env.reset()
     
     return {
-        "observation": obs.model_dump(),
-        "done": False,
-        "reward": 0.0,
-        "info": {}
+    "observation": obs.model_dump(),
+    "done": False,
+    "reward": 0.01,
+    "info": {}
     }
 
 # ── Step ────────────────────────────────────────────────────────────
