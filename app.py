@@ -53,6 +53,7 @@ def step(request: StepRequest):
     env = envs[task_id]
     action = EmailAction(response=request.response)
     obs, reward, done, info = env.step(action)
+    reward = round(min(max(reward, 0.01), 0.99), 2)
     
     return {
         "observation": obs.model_dump(),
