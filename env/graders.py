@@ -102,4 +102,5 @@ def grade_response(email: str, response: str, task_id: str = "task_1") -> float:
     if any(s in response_lower for s in satisfaction_signals):
         score += 0.05
 
-    return round(min(max(score, 0.0), 1.0), 2)
+    score = round(min(max(score, 0.01), 0.99), 2)
+    return score
