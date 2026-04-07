@@ -1,6 +1,6 @@
 def grade_response(email: str, response: str, task_id: str = "task_1") -> float:
     if not response or len(response.strip()) < 10:
-        return 0.0
+        return 0.01
 
     response_lower = response.lower()
     score = 0.0
