@@ -33,7 +33,7 @@ def log_step(step, action, reward, done, error=None):
 
     print(f"[STEP] step={step} action={action_clean} reward={reward:.2f} done={done_str} error={error_str}", flush=True)
 
-def log_end(success, steps, rewards):
+def log_end(success, steps, rewards, score):
     success_str = "true" if success else "false"
 
     # SAFE CLAMP ALL
@@ -47,7 +47,7 @@ def log_end(success, steps, rewards):
         safe_rewards.append(r)
 
     rewards_str = ",".join(f"{r:.2f}" for r in safe_rewards)
-    print(f"[END] success={success_str} steps={steps} rewards={rewards_str}", flush=True)
+    print(f"[END] success={success_str} steps={steps} score={score:.2f} rewards={rewards_str}", flush=True)
 
 # ── Get model response ───────────────────────────────────────────────
 def get_model_response(client, email, task_id, history):
@@ -152,7 +152,7 @@ def run_task(task_id: str):
         score = 0.01
 
     finally:
-        log_end(success=success, steps=steps_taken, rewards=rewards)
+        log_end(success=success, steps=steps_taken, rewards=rewards, score=score)
 
     return score
 
