@@ -7,11 +7,10 @@ sdk: docker
 pinned: false
 license: other
 tags:
-
-* openenv
-* reinforcement-learning
-* customer-support
-  ---
+  - openenv
+  - reinforcement-learning
+  - customer-support
+---
 
 # 📧 Email Response Environment
 
@@ -50,7 +49,6 @@ email-env/
 ├── requirements.txt
 └── README.md
 ```
-
 ---
 
 ## 🔍 Observation Space
@@ -67,7 +65,7 @@ email-env/
 
 | Field    | Type   | Description   |
 | -------- | ------ | ------------- |
-| response | string | Agent’s reply |
+| response | string | Agent's reply |
 
 ---
 
@@ -117,7 +115,6 @@ This guarantees:
 ### Task 3 — Hard
 
 * Multiple issues:
-
   * Wrong item
   * Billing error
   * No support response
@@ -129,7 +126,6 @@ Expected: Address **ALL issues clearly**
 ## 🚀 Setup & Usage
 
 ### Local Setup
-
 ```bash
 git clone https://github.com/your-username/email-env
 cd email-env
@@ -152,7 +148,6 @@ python -m uvicorn server.app:app --host 0.0.0.0 --port 7860
 ---
 
 ## 🧪 Example Usage
-
 ```python
 import requests
 
@@ -171,7 +166,6 @@ print(res.json())
 ---
 
 ## 🤖 Baseline Inference
-
 ```bash
 export HF_TOKEN=your_token
 export API_BASE_URL=https://router.huggingface.co/v1
@@ -183,7 +177,6 @@ python inference.py
 ---
 
 ## 🐳 Docker
-
 ```bash
 docker build -t email-env .
 docker run -p 7860:7860 email-env
@@ -214,8 +207,8 @@ docker run -p 7860:7860 email-env
 
 ## 🏁 Status
 
-✅ Phase 1: Passed
-✅ Phase 2: Passed
+✅ Phase 1: Passed  
+✅ Phase 2: Passed  
 🎯 Fully validated environment
 
 ---
