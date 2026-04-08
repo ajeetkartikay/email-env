@@ -90,13 +90,17 @@ def _compute_score(email: str, response: str, task_id: str = "task_1") -> float:
     score = max(0.01, min(0.99, score))
 
     # THEN ROUND
+    # STEP 1: round FIRST
     score = round(score, 2)
 
-    # FINAL SAFETY
+    # STEP 2: FIX rounding damage
     if score <= 0.0:
-        return 0.01
-    if score >= 1.0:
-        return 0.99
+        score = 0.01
+    elif score >= 1.0:
+        score = 0.99
+
+    # STEP 3: FINAL clamp safety
+    score = max(0.01, min(0.99, score))
 
     return score
 
