@@ -7,151 +7,163 @@ sdk: docker
 pinned: false
 license: other
 tags:
-  - openenv
-  - reinforcement-learning
-  - customer-support
+
+* openenv
+* reinforcement-learning
+* customer-support
 ---
+
 # 📧 Email Response Environment
 
-An OpenEnv-compliant reinforcement learning environment that simulates
-real-world customer support email triage. An AI agent must read customer
-emails and generate appropriate, empathetic, and solution-oriented responses.
+An OpenEnv-compliant reinforcement learning environment that simulates real-world customer support email handling.
+An AI agent must read customer emails and generate empathetic, professional, and solution-oriented responses.
 
 ---
 
 ## 🌍 Motivation
 
-Customer support email handling is a high-volume, real-world task performed
-by humans every day. Training and evaluating AI agents on this task has
-direct practical value — better agents mean faster resolution times,
-happier customers, and reduced support costs.
+Customer support is a high-volume, real-world problem. Automating email responses using AI can:
 
-This environment provides a structured, scorable framework for developing
-and benchmarking such agents.
+* Reduce response time
+* Improve customer satisfaction
+* Lower operational costs
+
+This environment provides a structured and **scorable benchmark** for evaluating such systems.
 
 ---
 
 ## 📦 Project Structure
+
 ```
 email-env/
 ├── env/
 │   ├── __init__.py
 │   ├── environment.py   # Core environment logic
 │   ├── graders.py       # Reward/scoring functions
-│   └── models.py        # Pydantic typed models
+│   └── models.py        # Typed models
 ├── server/
-│   ├── __init__.py      # Server package
-│   └── app.py           # Server entry point
-├── app.py               # FastAPI server (HF Space endpoint)
-├── inference.py         # Baseline inference script
-├── server.py            # Legacy server file
-├── openenv.yaml         # OpenEnv spec metadata
-├── pyproject.toml       # Project configuration
-├── uv.lock              # Dependency lock file
-├── Dockerfile           # Container definition
-├── requirements.txt     # Python dependencies
-└── README.md            # This file
+│   └── app.py           # API server
+├── app.py               # FastAPI entrypoint
+├── inference.py         # Agent logic
+├── openenv.yaml         # OpenEnv spec
+├── Dockerfile
+├── requirements.txt
+└── README.md
 ```
 
 ---
 
 ## 🔍 Observation Space
 
-| Field       | Type   | Description                              |
-|-------------|--------|------------------------------------------|
-| email       | string | The customer email the agent must reply to |
-| step_count  | int    | Number of steps taken in the episode     |
-| task_id     | string | Identifier for the current task          |
+| Field      | Type   | Description             |
+| ---------- | ------ | ----------------------- |
+| email      | string | Customer email          |
+| step_count | int    | Number of steps taken   |
+| task_id    | string | Current task identifier |
 
 ---
 
 ## ⚡ Action Space
 
-| Field    | Type   | Description                        |
-|----------|--------|------------------------------------|
-| response | string | The agent's reply to the customer  |
+| Field    | Type   | Description   |
+| -------- | ------ | ------------- |
+| response | string | Agent’s reply |
 
 ---
 
 ## 🏆 Reward Function
 
-Rewards are scored between **0.0 and 1.0** based on response quality:
+The reward system evaluates responses across multiple dimensions:
 
-| Criteria                        | reward |
-|---------------------------------|--------|
-| Apology present                 | +0.30  |
-| Solution or resolution offered  | +0.30  |
-| Polite/thankful tone            | +0.20  |
-| Issue acknowledged specifically | +0.20  |
+| Criteria                | Contribution |
+| ----------------------- | ------------ |
+| Apology present         | +0.15        |
+| Solution provided       | +0.15        |
+| Polite tone             | +0.10        |
+| Issue acknowledgement   | +0.00–0.10   |
+| Response length quality | +0.01–0.10   |
+| Structured format       | +0.10        |
+| Professional tone bonus | +0.00–0.09   |
+| Task-specific bonuses   | +0.04–0.09   |
+| Rude tone penalty       | −0.20        |
 
-Rewards are **partial** — an agent gets credit for each criterion it meets,
-encouraging incremental improvement rather than binary pass/fail.
+### 🔒 Important Constraint
+
+👉 Final scores are:
+
+* Rounded to **2 decimal places**
+* Strictly clamped between **0.01 and 0.99**
+
+This guarantees:
+
+*  No `0.0`
+*  No `1.0`
+*  Fully compatible with evaluation systems
 
 ---
 
 ## 📋 Tasks
 
-### Task 1 — Simple Refund Request (Easy)
-- **Email:** Customer asking for a refund on a damaged item
-- **Expected behavior:** Apologize, confirm refund, thank customer
-- **Difficulty:** Easy
-- **Expected score:** 0.8 – 1.0
+### Task 1 — Easy
 
-### Task 2 — Angry Delayed Delivery (Medium)
-- **Email:** Angry customer threatening a bad review over delayed delivery
-- **Expected behavior:** De-escalate, apologize sincerely, offer solution
-- **Difficulty:** Medium
-- **Expected score:** 0.6 – 0.9
+* Refund request for damaged item
+* Expected: Apology + refund + polite tone
 
-### Task 3 — Multi-Issue Complaint (Hard)
-- **Email:** Customer with wrong item received, billing error, and no
-  support response for 2 weeks
-- **Expected behavior:** Address ALL issues, escalate appropriately,
-  provide clear resolution path
-- **Difficulty:** Hard
-- **Expected score:** 0.4 – 0.8
+### Task 2 — Medium
+
+* Angry customer (delayed delivery)
+* Expected: De-escalation + empathy + solution
+
+### Task 3 — Hard
+
+* Multiple issues:
+
+  * Wrong item
+  * Billing error
+  * No support response
+
+Expected: Address **ALL issues clearly**
 
 ---
 
 ## 🚀 Setup & Usage
 
 ### Local Setup
+
 ```bash
-# 1. Clone the repo
 git clone https://github.com/your-username/email-env
 cd email-env
-
-# 2. Install dependencies
 pip install -r requirements.txt
-
-# 3. Start the server
-python -m uvicorn server:app --host 0.0.0.0 --port 7860
+python -m uvicorn server.app:app --host 0.0.0.0 --port 7860
 ```
 
-### API Endpoints
+---
 
-| Method | Endpoint  | Description              |
-|--------|-----------|--------------------------|
-| GET    | /         | Health check             |
-| POST   | /reset    | Reset environment        |
-| POST   | /step     | Take a step              |
-| GET    | /state    | Get current state        |
-| GET    | /tasks    | List all tasks           |
-| GET    | /docs     | Interactive API docs     |
+## 🔗 API Endpoints
 
-### Example Usage
+| Method | Endpoint | Description       |
+| ------ | -------- | ----------------- |
+| GET    | /        | Health check      |
+| POST   | /reset   | Reset environment |
+| POST   | /step    | Take action       |
+| GET    | /state   | Current state     |
+| GET    | /tasks   | Task list         |
+
+---
+
+## 🧪 Example Usage
+
 ```python
 import requests
 
-# Reset environment
+# Reset
 res = requests.post("http://localhost:7860/reset", json={"task_id": "task_1"})
 print(res.json())
 
-# Take a step
+# Step
 res = requests.post("http://localhost:7860/step", json={
     "task_id": "task_1",
-    "response": "Dear customer, I sincerely apologize for the damaged item.
-    We will process your refund within 24 hours. Thank you for your patience."
+    "response": "Dear customer, we sincerely apologize for the issue. We will process your refund immediately. Thank you for your patience."
 })
 print(res.json())
 ```
@@ -159,30 +171,21 @@ print(res.json())
 ---
 
 ## 🤖 Baseline Inference
-```bash
-# Set environment variables
-$env:HF_TOKEN="your-huggingface-token"
-$env:API_BASE_URL="https://router.huggingface.co/v1"
-$env:MODEL_NAME="Qwen/Qwen2.5-72B-Instruct"
 
-# Run inference
+```bash
+export HF_TOKEN=your_token
+export API_BASE_URL=https://router.huggingface.co/v1
+export MODEL_NAME=Qwen/Qwen2.5-72B-Instruct
+
 python inference.py
 ```
 
-### Baseline Scores
-
-| Task   | Difficulty | Baseline Score |
-|--------|------------|----------------|
-| task_1 | Easy       | 0.83          |
-| task_2 | Medium     | 0.84          |
-| task_3 | Hard       | 0.94           |
+---
 
 ## 🐳 Docker
-```bash
-# Build
-docker build -t email-env .
 
-# Run
+```bash
+docker build -t email-env .
 docker run -p 7860:7860 email-env
 ```
 
@@ -190,24 +193,30 @@ docker run -p 7860:7860 email-env
 
 ## ⚙️ Environment Variables
 
-| Variable      | Description                        | Default                              |
-|---------------|------------------------------------|--------------------------------------|
-| HF_TOKEN      | HuggingFace / API key              | required                             |
-| API_BASE_URL  | LLM API endpoint                   | https://router.huggingface.co/v1     |
-| MODEL_NAME    | Model identifier                   | Qwen/Qwen2.5-72B-Instruct            |
+| Variable     | Description  |
+| ------------ | ------------ |
+| HF_TOKEN     | API key      |
+| API_BASE_URL | LLM endpoint |
+| MODEL_NAME   | Model name   |
 
 ---
 
-## 📊 OpenEnv Spec
+## 📊 OpenEnv Compliance
 
-This environment is fully compliant with the OpenEnv specification:
-- ✅ Typed Pydantic models for Observation, Action, State
-- ✅ `step()` → returns observation, reward, done, info
-- ✅ `reset()` → returns initial observation
-- ✅ `state()` → returns current state
-- ✅ `openenv.yaml` metadata file
-- ✅ Scores between 0.0 and 1.0
-- ✅ 3 tasks with difficulty progression
+*  Typed models (Observation, Action, State)
+* `reset()` and `step()` implemented
+*  Deterministic reward function
+*  Scores strictly in **(0, 1)**
+*  Robust edge-case handling
+*  Compatible with automated evaluators
+
+---
+
+## 🏁 Status
+
+* Phase 1: Passed
+* Phase 2: Passed
+* Fully validated environment
 
 ---
 
