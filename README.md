@@ -11,7 +11,7 @@ tags:
 * openenv
 * reinforcement-learning
 * customer-support
----
+  ---
 
 # 📧 Email Response Environment
 
@@ -96,9 +96,9 @@ The reward system evaluates responses across multiple dimensions:
 
 This guarantees:
 
-*  No `0.0`
-*  No `1.0`
-*  Fully compatible with evaluation systems
+* ❌ No `0.0`
+* ❌ No `1.0`
+* ✅ Fully compatible with evaluation systems
 
 ---
 
