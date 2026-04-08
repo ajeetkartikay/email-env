@@ -3,7 +3,9 @@ def _compute_score(email: str, response: str, task_id: str = "task_1") -> float:
         return 0.01
 
     response_lower = response.lower()
-    score = 0.0
+
+    #  START SAFE (never 0)
+    score = 0.01
 
     # 1. APOLOGY CHECK
     apology_words = ["sorry", "apologize", "apologies", "regret"]
@@ -39,7 +41,7 @@ def _compute_score(email: str, response: str, task_id: str = "task_1") -> float:
     else:
         score += 0.05
 
-    # 6. STRUCTURE SCORING
+    # 6. STRUCTURE
     greetings = ["dear", "hello", "hi ", "good morning"]
     if any(g in response_lower for g in greetings):
         score += 0.05
@@ -51,28 +53,28 @@ def _compute_score(email: str, response: str, task_id: str = "task_1") -> float:
     if "\n" in response or len(response) > 100:
         score += 0.05
 
-    # 7. RUDE TONE PENALTY
+    # 7. RUDE PENALTY
     rude_words = ["not my problem", "not our fault", "impossible",
                   "can't help", "cannot help", "ridiculous", "your fault"]
     if any(word in response_lower for word in rude_words):
         score -= 0.20
 
-    # 8. PROFESSIONAL TONE BONUS
+    # 8. PROFESSIONAL BONUS
     professional_words = ["please", "certainly", "absolutely", "immediately",
                           "priority", "dedicated", "committed", "ensure"]
     prof_matches = sum(1 for word in professional_words if word in response_lower)
     score += min(prof_matches * 0.03, 0.09)
 
-    # 9. TASK-SPECIFIC SCORING
+    # 9. TASK-SPECIFIC
     if task_id == "task_1":
         if any(w in response_lower for w in ["refund", "return", "reimburse"]):
             score += 0.04
 
     elif task_id == "task_2":
         if any(w in response_lower for w in ["understand your frustration",
-                                              "completely understand",
-                                              "deeply sorry",
-                                              "sincerely apologize"]):
+                                             "completely understand",
+                                             "deeply sorry",
+                                             "sincerely apologize"]):
             score += 0.04
 
     elif task_id == "task_3":
@@ -85,41 +87,29 @@ def _compute_score(email: str, response: str, task_id: str = "task_1") -> float:
             issues_addressed += 1
         score += min(issues_addressed * 0.04, 0.09)
 
-    # 10. HARD CLAMP - never return 0.0 or 1.0
-    # HARD CLAMP BEFORE ROUNDING
-    score = max(0.01, min(0.99, score))
-
-    # THEN ROUND
-    # STEP 1: round FIRST
     score = round(score, 2)
 
-    # STEP 2: FIX rounding damage
     if score <= 0.0:
         score = 0.01
     elif score >= 1.0:
         score = 0.99
 
-    # STEP 3: FINAL clamp safety
     score = max(0.01, min(0.99, score))
 
     return score
 
 
 def grade_response(email: str, response: str, task_id: str = "task_1") -> float:
-    result = _compute_score(email, response, task_id)
-    return max(0.01, min(0.99, result))
+    return max(0.01, min(0.99, _compute_score(email, response, task_id)))
 
 
 def grade_easy(email: str, response: str) -> float:
-    result = _compute_score(email, response, "task_1")
-    return max(0.01, min(0.99, result))
+    return max(0.01, min(0.99, _compute_score(email, response, "task_1")))
 
 
 def grade_medium(email: str, response: str) -> float:
-    result = _compute_score(email, response, "task_2")
-    return max(0.01, min(0.99, result))
+    return max(0.01, min(0.99, _compute_score(email, response, "task_2")))
 
 
 def grade_hard(email: str, response: str) -> float:
-    result = _compute_score(email, response, "task_3")
-    return max(0.01, min(0.99, result))
+    return max(0.01, min(0.99, _compute_score(email, response, "task_3")))
