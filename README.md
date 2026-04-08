@@ -203,20 +203,20 @@ docker run -p 7860:7860 email-env
 
 ## 📊 OpenEnv Compliance
 
-*  Typed models (Observation, Action, State)
-* `reset()` and `step()` implemented
-*  Deterministic reward function
-*  Scores strictly in **(0, 1)**
-*  Robust edge-case handling
-*  Compatible with automated evaluators
+* ✅ Typed models (Observation, Action, State)
+* ✅ `reset()` and `step()` implemented
+* ✅ Deterministic reward function
+* ✅ Scores strictly in **(0, 1)**
+* ✅ Robust edge-case handling
+* ✅ Compatible with automated evaluators
 
 ---
 
 ## 🏁 Status
 
-* Phase 1: Passed
-* Phase 2: Passed
-* Fully validated environment
+✅ Phase 1: Passed
+✅ Phase 2: Passed
+🎯 Fully validated environment
 
 ---
 
