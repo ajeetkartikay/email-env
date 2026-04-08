@@ -26,15 +26,15 @@ class EmailEnv:
     def step(self, action: EmailAction) -> Tuple[EmailObservation, float, bool, dict]:
         if self._state.done:
             return (
-                EmailObservation(
-                    email=self._state.current_email,
-                    step_count=self._state.step_count,
-                    task_id=self._state.task_id
-                ),
-                0.0,
-                True,
-                {}
-            )
+            EmailObservation(
+                email=self._state.current_email,
+                step_count=self._state.step_count,
+                task_id=self._state.task_id
+            ),
+            0.01,  
+            True,
+            {}
+    )
 
         self._state.step_count += 1
         score = grade_response(self._state.current_email, action.response, self.task_id)
