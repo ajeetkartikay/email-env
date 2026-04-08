@@ -86,11 +86,18 @@ def _compute_score(email: str, response: str, task_id: str = "task_1") -> float:
         score += min(issues_addressed * 0.04, 0.09)
 
     # 10. HARD CLAMP - never return 0.0 or 1.0
+    # HARD CLAMP BEFORE ROUNDING
+    score = max(0.01, min(0.99, score))
+
+    # THEN ROUND
     score = round(score, 2)
+
+    # FINAL SAFETY
     if score <= 0.0:
         return 0.01
     if score >= 1.0:
         return 0.99
+
     return score
 
 
