@@ -1,5 +1,4 @@
 import os
-import sys
 from openai import OpenAI
 from env.environment import EmailEnv
 from env.models import EmailAction
@@ -20,13 +19,17 @@ def log_start(task, env, model):
     print(f"[START] task={task} env={env} model={model}", flush=True)
 
 def log_step(step, action, reward, done, error=None):
-    done_str = "true" if done else "false"
+    done_str  = "true" if done else "false"
     error_str = error if error else "null"
     action_clean = action.replace("\n", " ").strip()[:200]
+    # clamp reward in log too
+    reward = max(0.01, min(0.99, reward))
     print(f"[STEP] step={step} action={action_clean} reward={reward:.2f} done={done_str} error={error_str}", flush=True)
 
 def log_end(success, steps, rewards):
     success_str = "true" if success else "false"
+    # clamp all rewards
+    rewards = [max(0.01, min(0.99, r)) for r in rewards]
     rewards_str = ",".join(f"{r:.2f}" for r in rewards)
     print(f"[END] success={success_str} steps={steps} rewards={rewards_str}", flush=True)
 
@@ -34,7 +37,6 @@ def log_end(success, steps, rewards):
 def get_model_response(client, email, task_id, history):
     history_text = "\n".join(history) if history else "None"
 
-    # difficulty hint per task
     hints = {
         "task_1": "This is a simple refund request. Be polite and process it.",
         "task_2": "Customer is angry. Apologize sincerely and offer a solution.",
@@ -75,11 +77,11 @@ def run_task(task_id: str):
     client = OpenAI(base_url=API_BASE_URL, api_key=API_KEY)
     env    = EmailEnv(task_id=task_id)
 
-    history  = []
-    rewards  = []
+    history     = []
+    rewards     = []
     steps_taken = 0
-    score    = 0.0
-    success  = False
+    score       = 0.01
+    success     = False
 
     log_start(task=task_id, env=BENCHMARK, model=MODEL_NAME)
 
@@ -92,12 +94,13 @@ def run_task(task_id: str):
             if state and state.done:
                 break
 
-            # get model response
             action_text = get_model_response(client, email, task_id, history)
             action      = EmailAction(response=action_text)
 
-            # step environment
             obs, reward, done, info = env.step(action)
+
+            # clamp reward strictly between 0 and 1
+            reward = max(0.01, min(0.99, round(reward, 2)))
 
             rewards.append(reward)
             steps_taken = step
@@ -108,13 +111,14 @@ def run_task(task_id: str):
             if done:
                 break
 
-        score   = sum(rewards) / len(rewards) if rewards else 0.0
-        score   = round(min(max(score, 0.0), 1.0), 2)
+        score = sum(rewards) / len(rewards) if rewards else 0.01
+        score = max(0.01, min(0.99, round(score, 2)))
         success = score >= SUCCESS_THRESHOLD
 
     except Exception as e:
-        log_step(step=steps_taken + 1, action="", reward=0.0, done=True, error=str(e))
+        log_step(step=steps_taken + 1, action="", reward=0.01, done=True, error=str(e))
         success = False
+        score = 0.01
 
     finally:
         log_end(success=success, steps=steps_taken, rewards=rewards)
